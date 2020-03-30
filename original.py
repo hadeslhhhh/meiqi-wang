@@ -704,7 +704,7 @@ def disk_slfcal(vis, slfcaltbdir='./'):
     vis2 = 'slf2_' + msfile
     if os.path.exists(vis2):
         os.system('rm -rf {}'.format(vis2))
-    mstl.splitX(vis, outputvis=vis2, datacolumn="corrected", datacolumn2="model_data")
+    mstl.splitX(vis1, outputvis=vis2, datacolumn="corrected", datacolumn2="model_data")
     ## todo check why use vis as input in line 711 and 728
 
     caltb = os.path.join(slfcaltbdir, tdate + '_3.amp')
@@ -721,7 +721,7 @@ def disk_slfcal(vis, slfcaltbdir='./'):
     vis3 = 'slf3_' + msfile
     if os.path.exists(vis3):
         os.system('rm -rf {}'.format(vis3))
-    mstl.splitX(vis, outputvis=vis3, datacolumn="corrected", datacolumn2="model_data")
+    mstl.splitX(vis2, outputvis=vis3, datacolumn="corrected", datacolumn2="model_data")
     uvsub(vis=vis3, reverse=False)
 
     # Final split to
@@ -895,7 +895,10 @@ def plt_eovsa_image(eofiles, figoutdir='./'):
         # ax = axs[idx]
         eomap = smap.Map(eofile)
         tb_disk = eomap.meta['TBDISK']
-        norm = colors.Normalize(vmin=tb_disk * (-0.2), vmax=tb_disk * 2.0)
+        vmaxs = [22.0e4, 8.0e4, 5.4e4, 3.5e4, 2.3e4, 1.8e4, 1.5e4]
+        vmins = [-9.0e3, -5.5e3, -3.4e3, -2.5e3, -2.5e3, -2.5e3, -2.5e3]
+        norm = colors.Normalize(vmin=vmins[idx], vmax=vmaxs[idx])
+        #norm = colors.Normalize(vmin=tb_disk * (-0.2), vmax=tb_disk * 2.0)
         eomap_ = pmX.Sunmap(eomap)
         eomap_.imshow(axes=ax, cmap=cmap, norm=norm)
         eomap_.draw_limb(axes=ax, lw=0.5, alpha=0.5)
@@ -903,7 +906,7 @@ def plt_eovsa_image(eofiles, figoutdir='./'):
         divider = make_axes_locatable(ax)
         cax = divider.append_axes('right', size='2.0%', pad=0.08)
         cax.tick_params(direction='in')
-        clb = colorbar.ColorbarBase(cax, cmap=cmap, norm=colors.Normalize(vmin=0., vmax=tb_disk * 1.75 / 1e3))
+        clb = colorbar.ColorbarBase(cax, cmap=cmap, norm=norm))
         clb.set_label(r'T$_b$ [$\times$10$^3$K]')
         if idx != nfiles / 2:
             ax.set_xlabel('')
@@ -980,6 +983,7 @@ def pipeline_run(vis, outputvis='', workdir=None, slfcaltbdir=None, imgoutdir=No
         data = fits.getdata(file)
         data.shape = data.shape[-2:]  # gets rid of any leading axes of size 1
         # if np.nanmax(np.nanmax(data)) > 300000: bright[idx] = True
+        max1 = tb_disk
         if np.nanmax(data) > 5.0 * tb_disk: bright[idx] = True
     bright[-1] = False  # skip the image of the highest bands for feature slfcal
 
@@ -1019,4 +1023,5 @@ def pipeline_run(vis, outputvis='', workdir=None, slfcaltbdir=None, imgoutdir=No
 
     plt_eovsa_image(eofiles_new[:-1], figoutdir)  # skip plotting the image of the highest bands
 
-    return ms_slfcaled, diskxmlfile, tb_disk
+    return ms_slfcaled, diskxmlfile, max1, tb_disk
+
