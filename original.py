@@ -906,7 +906,7 @@ def plt_eovsa_image(eofiles, figoutdir='./'):
         divider = make_axes_locatable(ax)
         cax = divider.append_axes('right', size='2.0%', pad=0.08)
         cax.tick_params(direction='in')
-        clb = colorbar.ColorbarBase(cax, cmap=cmap, norm=norm))
+        clb = colorbar.ColorbarBase(cax, cmap=cmap, norm=norm)
         clb.set_label(r'T$_b$ [$\times$10$^3$K]')
         if idx != nfiles / 2:
             ax.set_xlabel('')
