@@ -1025,3 +1025,6 @@ def pipeline_run(vis, outputvis='', workdir=None, slfcaltbdir=None, imgoutdir=No
 
     return ms_slfcaled, diskxmlfile, max1, tb_disk
 
+vis = '/data1/eovsa/fits/UDBms/202001/UDB20200102.ms'
+
+pipeline_run(vis, outputvis='final0102.ms', workdir='data1/meiqi', slfcaltbdir=None, imgoutdir=None, figoutdir=None)
